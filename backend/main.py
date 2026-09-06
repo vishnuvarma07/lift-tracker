@@ -98,6 +98,32 @@ def login_user(
         "token_type": "bearer"
     }
 
+@app.get("/splits")
+def get_splits(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    splits = db.query(models.Split).filter(models.Split.user_id == current_user.id).all()
+    return splits
+
+@app.post("/splits")
+def create_split(
+    split: schemas.SplitCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    new_split = models.Split(
+        name = split.name,
+        user_id = current_user.id
+    )
+
+    db.add(new_split)
+    db.commit()
+    db.refresh(new_split)
+
+    return new_split
+
+
 
 
     
