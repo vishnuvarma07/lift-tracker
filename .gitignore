@@ -6,11 +6,12 @@ __pycache__/
 # React
 lift-tracker/node_modules/
 lift-tracker/dist/
+lift-tracker/.vite/
 
 # Secrets
 .env
 backend/.env
-frontend/.env
+lift-tracker/.env
 
 # macOS
 .DS_Store
