@@ -1,0 +1,118 @@
+from fastapi import FastAPI, Depends, HTTPException
+from database import SessionLocal, Base, engine
+from sqlalchemy.orm import Session
+from pwdlib import PasswordHash
+import models
+import schemas
+from datetime import datetime, timedelta, timezone
+
+import jwt
+from jwt.exceptions import InvalidTokenError
+
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
+
+SECRET_KEY = "e35fe8b6f657402ba60007f1ce06b4d8ec9094d46b0676dbe42beeab88c73c77"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+app = FastAPI()
+
+password_hasher = PasswordHash().recommended
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+models.Base.metadata.create_all(bind=engine)
+
+def create_token(data:dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        user_id = int(user_id)
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail = "Invalid Token")
+    user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+
+    
+
+@app.post("/register")
+def register_user(
+    user: schemas.UserCreate,
+    db: Session = Depends(get_db)
+):
+    existing_user = db.query(models.User).filter(models.User.username == user.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+
+    hashed_password = password_hasher.hash(user.password)
+    new_user = models.User(username=user.username, password_hash=hashed_password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return {"message": "User registered successfully", "user_id": new_user.id}
+
+@app.post("/login")
+def login_user(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db:Session = Depends(get_db)
+):
+    existing_user = db.query(models.User).filter(models.User.username == form_data.username).first()
+
+    if existing_user is None:
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+    
+    password_check = password_hasher.verify(form_data.password, existing_user.password_hash)
+
+    if not password_check:
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+
+    access_token = create_token(
+        data={"sub": str(existing_user.id)}
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

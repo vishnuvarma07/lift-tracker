@@ -1,0 +1,16 @@
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+
+# React
+lift-tracker/node_modules/
+lift-tracker/dist/
+
+# Secrets
+.env
+backend/.env
+frontend/.env
+
+# macOS
+.DS_Store
