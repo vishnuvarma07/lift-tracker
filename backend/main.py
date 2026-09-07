@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Depends, HTTPException
 from database import SessionLocal, Base, engine
 from sqlalchemy.orm import Session
@@ -11,8 +13,10 @@ from jwt.exceptions import InvalidTokenError
 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 
-SECRET_KEY = "e35fe8b6f657402ba60007f1ce06b4d8ec9094d46b0676dbe42beeab88c73c77"
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -20,7 +24,20 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 app = FastAPI()
 
-password_hasher = PasswordHash().recommended
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+password_hasher = PasswordHash.recommended()
 
 def get_db():
     db = SessionLocal()
