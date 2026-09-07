@@ -11,7 +11,7 @@ function AuthPage() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        const response = await fetch("http://localhost:8000/register", {
+        const response = await fetch(`${API_URL}/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -35,7 +35,7 @@ function AuthPage() {
         formData.append("username", username);
         formData.append("password", password);
 
-        const response = await fetch("http://localhost:8000/login", {
+        const response = await fetch(`${API_URL}/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"

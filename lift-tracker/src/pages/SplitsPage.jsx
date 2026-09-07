@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+const navigate = useNavigate();
 
 function SplitsPage() {
     const [splits, setSplits] = useState([]);
+    const [newSplitName, setNewSplitName] = useState("");
 
     useEffect(() => {
         const getSplits = async () => {
             const token = localStorage.getItem("token");
 
-            const response = await fetch("http://localhost:8000/splits", {
+            const response = await fetch(`${API_URL}/splits`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -25,15 +31,53 @@ function SplitsPage() {
         getSplits();
     }, []);
 
+    const handleAddSplit = async (e) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(`${API_URL}/splits`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body:JSON.stringify({ name: newSplitName }),
+        });
+
+        if(!response.ok) {
+            alert("Could not add split.");
+            return;
+        }
+
+        const newSplit = await response.json();
+        setSplits([...splits, newSplit]);
+        setNewSplitName("");
+
+    };
+
+
+    
+
     return (
         <div>
             <h1>My Splits</h1>
 
             {splits.map((split) => (
-                <div key={split.id}>
-                    <h2>{split.name}</h2>
-                </div>
+                <button key={split.id} onClick={() => navigate(`/splits/${split.id}`)}>
+                    {split.name}
+                </button>
             ))}
+
+            <form onSubmit={handleAddSplit}>
+                <input
+                    type="text"
+                    value={newSplitName}
+                    onChange={(e) => setNewSplitName(e.target.value)}
+                    placeholder="Split Name"
+                />
+                <button type="submit">Add Split</button>
+            </form>
         </div>
     );
 }
