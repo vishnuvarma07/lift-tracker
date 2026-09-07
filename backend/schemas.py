@@ -16,7 +16,6 @@ class SplitCreate(BaseModel):
 
 class SplitDayCreate(BaseModel):
     name:str
-    day_order:int
 
 class SplitDayExercisesCreate(BaseModel):
     exercise_id:int

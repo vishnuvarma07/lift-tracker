@@ -142,6 +142,54 @@ def create_split(
 
     return new_split
 
+@app.get("/splits/{split_id}/days")
+def get_split_days(
+    split_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    split = db.query(models.Split).filter(models.Split.id == split.id, models.Split.user_id == current_user.id).first()
+
+    if split is None:
+        raise HTTPException(status_code=404, detail="Split not found")
+
+    return db.query(
+        models.SplitDay
+        .filter(models.SplitDay.split_id == split.id)
+        .order_by(models.SplitDay.day_number)
+        .all()
+    )
+
+@app.post("/splits/{split_id}/days")
+def create_split_day(
+    split_id: int,
+    split_day: schemas.SplitDayCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    split = db.query(models.Split).filter(models.Split.id == split_id, models.Split.user_id == current_user.id).first()
+
+    if split is None:
+        raise HTTPException(status_code=404, detail="Split not found")
+
+    existing_days = (
+        db.query(models.SplitDay)
+        .filter(models.SplitDay.split_id == split_id)
+        .count()
+    )
+
+    new_split_day = models.SplitDay(
+        name = split_day.name,
+        split_id = split.id,
+        day_order = existing_days + 1
+    )
+
+    db.add(new_split_day)
+    db.commit()
+    db.refresh(new_split_day)
+
+    return new_split_day
+
 
 
 

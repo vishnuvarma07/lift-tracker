@@ -19,7 +19,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        
         <Route
           path="/splits/:splitId"
           element={
@@ -28,7 +28,9 @@ function App() {
               </ProtectedRoute>
           }
         />
+        
       </Routes>
+      
     </BrowserRouter>
   );
 }
