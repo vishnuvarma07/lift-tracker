@@ -4,6 +4,8 @@ import AuthPage from "./pages/AuthPage";
 import SplitsPage from "./pages/SplitsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SplitDaysPage from "./pages/SplitDaysPage";
+import DayPage from "./pages/DayPage"
+
 
 function App() {
   return (
@@ -26,6 +28,15 @@ function App() {
               <ProtectedRoute>
                   <SplitDaysPage />
               </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path = "/splits/:splitId/days/:dayId"
+          element={
+            <ProtectedRoute>
+                <DayPage />
+            </ProtectedRoute>
           }
         />
         

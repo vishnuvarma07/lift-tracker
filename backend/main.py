@@ -214,6 +214,8 @@ def create_split_day(
 
     return new_split_day
 
+@app.get("/split/{splitID}/days/{}")
+
 
 
 
