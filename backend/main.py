@@ -214,7 +214,32 @@ def create_split_day(
 
     return new_split_day
 
-@app.get("/split/{splitID}/days/{}")
+@app.get("/split/{splitId}/days/{dayId}")
+def get_split_day(
+    splitId:int,
+    dayId:int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    split = db.query(models.Split).filter(
+        models.Split.id == splitId,
+        models.Split.user_id == current_user.id
+    ).first()
+
+    if not split:
+        raise HTTPException(status_code=404, detail="Split not found")
+
+    day = db.query(models.SplitDay).filter(
+        models.SplitDay.id == dayId,
+        models.SplitDay.user_id == current_user.id
+    )
+
+    if not day:
+        raise HTTPException(status_code=404, detail="Split not found")
+
+    return day
+
+    
 
 
 
