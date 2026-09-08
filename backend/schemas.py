@@ -10,17 +10,13 @@ class UserLogin(BaseModel):
 
 class ExerciseCreate(BaseModel):
     name:str
+    number_of_sets:int
 
 class SplitCreate(BaseModel):
     name:str
 
 class SplitDayCreate(BaseModel):
     name:str
-
-class SplitDayExercisesCreate(BaseModel):
-    exercise_id:int
-    exercise_order:int
-    sets:int
 
 class WorkoutCreate(BaseModel):
     split_day_id:int

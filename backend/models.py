@@ -8,12 +8,6 @@ class User(Base):
     username = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=False)
 
-class Exercise(Base):
-    __tablename__ = "exercises"
-
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    name = Column(String, nullable=False)
 
 class Split(Base):
     __tablename__ = "split"
@@ -30,14 +24,14 @@ class SplitDay(Base):
     split_id = Column(Integer, ForeignKey("split.id"), nullable=False)
     day_order = Column(Integer, nullable=False)
 
-class SplitDayExercises(Base):
+class Exercises(Base):
     __tablename__ = "split_day_exercises"
 
     id = Column(Integer, primary_key=True)
     split_day_id = Column(Integer, ForeignKey("split_day.id"), nullable=False)
     exercise_id = Column(Integer, ForeignKey("exercises.id"), nullable=False)
     exercise_order = Column(Integer, nullable=False)
-    target_sets = Column(Integer, nullable=False)
+    number_of_sets = Column(Integer, nullable=False)
 
 class Workouts(Base):
     __tablename__ = "workouts"
@@ -46,6 +40,7 @@ class Workouts(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     split_day_id = Column(Integer, ForeignKey("split_day.id"), nullable=False)
     date = Column(DateTime, nullable=False)
+    
 
 
 

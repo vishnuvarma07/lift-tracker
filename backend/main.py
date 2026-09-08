@@ -239,6 +239,44 @@ def get_split_day(
 
     return day
 
+@app.post("/split/{slitId}/days/{dayId}")
+def create_exercises(
+    splitId: int,
+    dayId: int,
+    exercise: schemas.ExerciseCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    split = db.query(models.Split).filter(
+        models.Split.id == splitId,
+        models.Split.user_id == current_user.id
+    ).first()
+
+    day = db.query(models.SplitDay).filter(
+        models.SplitDay.id == dayId,
+        models.SplitDay.user_id == current_user.id
+    ).first()
+
+    if not split or not day:
+        raise HTTPException(status_code=404, detail="Split or day not found")
+
+    last_exercise = db.query(models.Exercises).filter(
+        models.Exercises.split_day_id == dayId
+    ).order_by(
+        models.Exercises.exercise_order.desc()
+    ).first()
+
+    if last_exercise:
+        exercise_order = last_exercise.exercise_order + 1
+    else:
+        exercise_order = 1
+
+    new_exercise = models.Exercises(
+        name=exercise.name
+        number_of_sets = exercise.number_of_sets
+    )
+
+
     
 
 
