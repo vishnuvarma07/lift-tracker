@@ -274,7 +274,17 @@ def create_exercises(
     new_exercise = models.Exercises(
         name=exercise.name
         number_of_sets = exercise.number_of_sets
+        split_day_id = dayId
+        exercise_order = exercise_order
     )
+
+    db.add(new_exercise)
+    db.commit()
+    db.refresh(new_exercise)
+
+    return new_exercise
+
+
 
 
     
