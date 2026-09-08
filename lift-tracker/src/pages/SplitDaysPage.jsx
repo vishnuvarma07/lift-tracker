@@ -7,6 +7,7 @@ function SplitDaysPage() {
     const { splitId } = useParams();
     const navigate = useNavigate();
 
+    const [split, setSplit] = useState(null)
     const [days, setDays] = useState([]);
     const [newDayName, setNewDayName] = useState("");
 
@@ -30,6 +31,24 @@ function SplitDaysPage() {
 
             const data = await response.json();
             setDays(data);
+
+            const splitResponse = await fetch(
+                `${API_URL}/splits/${splitId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (!splitResponse.ok) {
+                alert("Could not load split");
+                return;
+            }
+
+            const splitData = await splitResponse.json();
+            setSplit(splitData);
+
         };
 
         getDays();
@@ -67,7 +86,7 @@ function SplitDaysPage() {
 
     return (
         <div>
-            <h1>Split Days</h1>
+            <h1>{split?.name}</h1>
 
             {days.map((day) => (
                 <button
