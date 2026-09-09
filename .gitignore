@@ -11,7 +11,7 @@ lift-tracker/.vite/
 # Secrets
 .env
 backend/.env
-lift-tracker/.env
+front_end/.env
 
 # macOS
 .DS_Store
