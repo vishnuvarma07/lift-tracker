@@ -10,6 +10,7 @@ function DayPage() {
     const [exercises, setExercises] = useState([])
     const [day, setDay] = useState(null)
     const [newExerciseName, setNewExerciseName] = useState("")
+    const [targetSets, setTargetSets] = useState(2)
 
     useEffect(() => {
         const getExercises = async () => {
@@ -45,6 +46,11 @@ function DayPage() {
     const handleAddExercise = async (e) => {
         e.preventDefault()
 
+        if(!newExerciseName.trim()) {
+            alert("Enter an exercise name");
+            return;
+        }
+
         const token = localStorage.getItem("token")
 
         const response = await fetch(
@@ -56,7 +62,8 @@ function DayPage() {
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    exercise: newExerciseName
+                    name: newExerciseName,
+                    target_sets: targetSets
                 })
             }
         );
@@ -111,6 +118,14 @@ function DayPage() {
                 value={newExerciseName}
                 onChange={(e) => setNewExerciseName(e.target.value)}
                 placeholder="Exercise Name"
+            />
+
+            <input
+                type="number"
+                min="1"
+                placeholder="Sets"
+                value={targetSets}
+                onChange={(e) => setTargetSets(Number(e.target.value))}
             />
 
             <button type="submit">
