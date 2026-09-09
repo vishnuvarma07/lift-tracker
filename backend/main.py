@@ -214,7 +214,7 @@ def create_split_day(
 
     return new_split_day
 
-@app.get("/split/{splitId}/days/{dayId}")
+@app.get("/splits/{splitId}/days/{dayId}")
 def get_split_day(
     splitId:int,
     dayId:int,
@@ -239,7 +239,7 @@ def get_split_day(
 
     return day
 
-@app.post("/split/{slitId}/days/{dayId}")
+@app.post("/splits/{slitId}/days/{dayId}")
 def create_exercises(
     splitId: int,
     dayId: int,
@@ -272,10 +272,10 @@ def create_exercises(
         exercise_order = 1
 
     new_exercise = models.Exercises(
-        name=exercise.name
-        number_of_sets = exercise.number_of_sets
-        split_day_id = dayId
-        exercise_order = exercise_order
+        name=exercise.name,
+        target_sets = exercise.target_sets,
+        split_day_id = dayId,
+        exercise_order = exercise_order,
     )
 
     db.add(new_exercise)
@@ -283,6 +283,38 @@ def create_exercises(
     db.refresh(new_exercise)
 
     return new_exercise
+
+@app.get("/splits/{splitId}/days/{dayId}/exercises")
+def get_exercises(
+    splitId: int,
+    dayId:int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+
+    split = db.query(models.Split).filter(
+        models.Split.id == splitId,
+        models.Split.user_id == current_user.id
+    ).first()
+
+    day = db.query(models.SplitDay).filter(
+        models.SplitDay.split_id == splitId,
+        models.SplitDay.id == dayId
+    ).first()
+
+    if not day or not split:
+        raise HTTPException(status_code=404, detail="Split or day not found")
+
+    exercises = db.query(models.Exercise).filter(
+        models.Exercise.split_day_id==dayId,
+    ).order_by(
+        models.Exercise.exercise_order
+    ).all()
+
+    return {
+        "exercises": exercises,
+        "day": day
+    }
 
 
 

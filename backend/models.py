@@ -24,14 +24,14 @@ class SplitDay(Base):
     split_id = Column(Integer, ForeignKey("split.id"), nullable=False)
     day_order = Column(Integer, nullable=False)
 
-class Exercises(Base):
+class Exercise(Base):
     __tablename__ = "split_day_exercises"
 
     id = Column(Integer, primary_key=True)
     split_day_id = Column(Integer, ForeignKey("split_day.id"), nullable=False)
     exercise_id = Column(Integer, ForeignKey("exercises.id"), nullable=False)
     exercise_order = Column(Integer, nullable=False)
-    number_of_sets = Column(Integer, nullable=False)
+    target_sets = Column(Integer, nullable=False)
 
 class Workouts(Base):
     __tablename__ = "workouts"
