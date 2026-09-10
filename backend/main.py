@@ -319,6 +319,135 @@ def get_exercises(
         "day": day
     }
 
+@app.post("/workouts")
+def create_workout(
+    workout: schemas.WorkoutCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    day = (
+        db.query(models.SplitDay)
+        .join(
+            models.Split,
+            models.SplitDay.split_id == models.Split.id
+        )
+        .filter(
+            models.SplitDay.id == workout.split_day_id,
+            models.Split.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not day:
+        raise HTTPException(
+            status_code=404,detail="Day not found"
+        )
+
+    new_workout = models.Workouts(
+        user_id = current_user.id,
+        split_day_id=workout.split_day_id,
+        date=datetime.now(timezone.utc)
+    )
+
+    db.add(new_workout)
+    db.commit()
+    db.refresh(new_workout)
+
+    return new_workout
+
+@app.post("/sets")
+def create_set(
+    set_data: schemas.SetCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    workout = db.query(models.Workouts).filter(
+        models.Workouts.id == set_data.workout_id,
+        models.Workouts.user_id == current_user.id
+    ).first()
+
+    if not workout:
+        raise HTTPException(
+            status_code=404,
+            detail="Workout not found"
+        )
+
+    exercise = db.query(models.Exercise).filter(
+        models.Exercise.id == set_data.exercise_id
+    ).first()
+
+    if not exercise:
+        raise HTTPException(
+            status_code=404,
+            detail="Exercise not found"
+        )
+
+    new_set = models.Sets(
+        exercise_id=set_data.exercise_id,
+        workout_id=set_data.workout_id,
+        set_number=set_data.set_number,
+        weight=set_data.weight,
+        reps=set_data.reps
+    )
+
+    db.add(new_set)
+    db.commit()
+    db.refresh(new_set)
+
+    return new_set
+
+
+@app.get("/splits/{splitId}/days/{dayId}/previous-workout")
+def get_previous_workout(
+    splitId: int,
+    dayId: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    split = db.query(models.Split).filter(
+        models.Split.id == splitId,
+        models.Split.user_id == current_user.id
+    ).first()
+
+    if not split:
+        raise HTTPException(
+            status_code=404,
+            detail="Split not found"
+        )
+
+    day = db.query(models.SplitDay).filter(
+        models.SplitDay.id == dayId,
+        models.SplitDay.split_id == splitId
+    ).first()
+
+    if not day:
+        raise HTTPException(
+            status_code=404,
+            detail="Day not found"
+        )
+
+    previous_workout = db.query(models.Workouts).filter(
+        models.Workouts.user_id == current_user.id,
+        models.Workouts.split_day_id == dayId
+    ).order_by(
+        models.Workouts.date.desc()
+    ).first()
+
+    if not previous_workout:
+        return {
+            "previous_workout": None,
+            "sets": []
+        }
+
+    previous_sets = db.query(models.Sets).filter(
+        models.Sets.workout_id == previous_workout.id
+    ).all()
+
+    return {
+        "previous_workout": previous_workout,
+        "sets": previous_sets
+    }
+
 
 
 

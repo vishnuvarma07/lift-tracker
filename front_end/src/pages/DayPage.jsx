@@ -1,22 +1,26 @@
-import { useNavigate, useParams } from "react-router-dom"
-import {useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function DayPage() {
-    const {splitId, dayId} = useParams();
-    const navigate = useNavigate()
+    const { splitId, dayId } = useParams();
+    const navigate = useNavigate();
 
-    const [exercises, setExercises] = useState([])
-    const [day, setDay] = useState(null)
-    const [newExerciseName, setNewExerciseName] = useState("")
-    const [targetSets, setTargetSets] = useState(2)
+    const [exercises, setExercises] = useState([]);
+    const [day, setDay] = useState(null);
+
+    const [newExerciseName, setNewExerciseName] = useState("");
+    const [targetSets, setTargetSets] = useState(2);
+
+    const [setData, setSetData] = useState({});
+    const [previousSets, setPreviousSets] = useState([]);
 
     useEffect(() => {
-        const getExercises = async () => {
+        const getPageData = async () => {
             const token = localStorage.getItem("token");
 
-            const response = await fetch(
+            const exerciseResponse = await fetch(
                 `${API_URL}/splits/${splitId}/days/${dayId}/exercises`,
                 {
                     headers: {
@@ -25,33 +29,47 @@ function DayPage() {
                 }
             );
 
-            console.log("response status:", response.status);
-
-            if (!response.ok) {
+            if (!exerciseResponse.ok) {
                 console.error("Could not load exercises");
                 return;
             }
 
-            const data = await response.json();
+            const exerciseData = await exerciseResponse.json();
 
-            console.log("data:", data);
+            setExercises(exerciseData.exercises);
+            setDay(exerciseData.day);
 
-            setExercises(data.exercises);
-            setDay(data.day);
+            const previousResponse = await fetch(
+                `${API_URL}/splits/${splitId}/days/${dayId}/previous-workout`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (!previousResponse.ok) {
+                console.error("Could not load previous workout");
+                return;
+            }
+
+            const previousData = await previousResponse.json();
+
+            setPreviousSets(previousData.sets);
         };
 
-        getExercises();
+        getPageData();
     }, [splitId, dayId]);
 
     const handleAddExercise = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        if(!newExerciseName.trim()) {
+        if (!newExerciseName.trim()) {
             alert("Enter an exercise name");
             return;
         }
 
-        const token = localStorage.getItem("token")
+        const token = localStorage.getItem("token");
 
         const response = await fetch(
             `${API_URL}/splits/${splitId}/days/${dayId}/exercises`,
@@ -68,74 +86,228 @@ function DayPage() {
             }
         );
 
-        if(!response.ok) {
-            alert("Could not add exercise")
+        if (!response.ok) {
+            alert("Could not add exercise");
             return;
         }
 
-        const newExercise = await response.json()
+        const newExercise = await response.json();
+
         setExercises([...exercises, newExercise]);
-        setNewExerciseName("")
+        setNewExerciseName("");
+        setTargetSets(2);
+    };
 
-    }
+    const handleSetChange = (
+        exerciseId,
+        setNumber,
+        field,
+        value
+    ) => {
+        setSetData((previous) => ({
+            ...previous,
 
-    return <div>
-        <button onClick={() => navigate(`/splits/${splitId}`)}>
-            Back
-        </button>
+            [exerciseId]: {
+                ...previous[exerciseId],
 
-        <h1> {day?.name} </h1>
+                [setNumber]: {
+                    ...previous[exerciseId]?.[setNumber],
 
-        {exercises.map((exercise) => (
-            <div key={exercise.id}>
+                    [field]: value
+                }
+            }
+        }));
+    };
 
-                <h3>
-                    {exercise.exercise_order}. {exercise.name}
-                </h3>
+    const handleFinishWorkout = async () => {
+        const token = localStorage.getItem("token");
 
-                {Array.from({ length: exercise.target_sets }).map((_, index) => (
-                    <div key={index}>
-                        <span>Set {index + 1}</span>
+        const workoutResponse = await fetch(
+            `${API_URL}/workouts`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    split_day_id: Number(dayId)
+                })
+            }
+        );
 
-                        <input
-                            type="number"
-                            placeholder="Weight"
-                        />
+        if (!workoutResponse.ok) {
+            alert("Could not create workout");
+            return;
+        }
 
-                        <input
-                            type="number"
-                            placeholder="Reps"
-                        />
-                    </div>
-                ))}
+        const workout = await workoutResponse.json();
 
-            </div>
-        ))}
+        for (const exercise of exercises) {
+            const exerciseSets = setData[exercise.id];
 
-        <form onSubmit={handleAddExercise}>
-            <input
-                type="text"
-                value={newExerciseName}
-                onChange={(e) => setNewExerciseName(e.target.value)}
-                placeholder="Exercise Name"
-            />
+            if (!exerciseSets) {
+                continue;
+            }
 
-            <input
-                type="number"
-                min="1"
-                placeholder="Sets"
-                value={targetSets}
-                onChange={(e) => setTargetSets(Number(e.target.value))}
-            />
+            for (const [setNumber, values] of Object.entries(exerciseSets)) {
 
-            <button type="submit">
-                Add Exercise
+                if (
+                    values.weight === "" ||
+                    values.reps === "" ||
+                    values.weight === undefined ||
+                    values.reps === undefined
+                ) {
+                    continue;
+                }
+
+                const response = await fetch(
+                    `${API_URL}/sets`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            exercise_id: exercise.id,
+                            workout_id: workout.id,
+                            set_number: Number(setNumber),
+                            weight: Number(values.weight),
+                            reps: Number(values.reps)
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+
+                    console.log(errorData);
+
+                    alert(errorData.detail);
+
+                    return;
+                }
+            }
+        }
+
+        alert("Workout saved!");
+        setSetData({});
+    };
+
+    return (
+        <div>
+            <button onClick={() => navigate(`/splits/${splitId}`)}>
+                Back
             </button>
-        </form>
 
-    </div>
+            <h1>{day?.name}</h1>
 
+            {exercises.map((exercise) => (
+                <div key={exercise.id}>
 
+                    <h3>
+                        {exercise.exercise_order}. {exercise.name}
+                    </h3>
+
+                    {Array.from({ length: exercise.target_sets }).map((_, index) => {
+                        const setNumber = index + 1;
+
+                        const previousSet = previousSets.find(
+                            (set) =>
+                                set.exercise_id === exercise.id &&
+                                set.set_number === setNumber
+                        );
+
+                        return (
+                            <div key={index}>
+                                <span>
+                                    Set {setNumber}
+                                </span>
+
+                                
+
+                                <input
+                                    type="number"
+                                    placeholder="Weight"
+                                    value={
+                                        setData[exercise.id]?.[setNumber]?.weight ?? ""
+                                    }
+                                    onChange={(e) =>
+                                        handleSetChange(
+                                            exercise.id,
+                                            setNumber,
+                                            "weight",
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <input
+                                    type="number"
+                                    placeholder="Reps"
+                                    value={
+                                        setData[exercise.id]?.[setNumber]?.reps ?? ""
+                                    }
+                                    onChange={(e) =>
+                                        handleSetChange(
+                                            exercise.id,
+                                            setNumber,
+                                            "reps",
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <span>
+                                    {previousSet
+                                        ? `Previous: ${previousSet.weight} x ${previousSet.reps}`
+                                        : "Previous: —"}
+                                </span>
+
+                            </div>
+                        );
+                    })}
+
+                </div>
+            ))}
+
+            <form onSubmit={handleAddExercise}>
+                <input
+                    type="text"
+                    value={newExerciseName}
+                    onChange={(e) =>
+                        setNewExerciseName(e.target.value)
+                    }
+                    placeholder="Exercise Name"
+                />
+
+                <input
+                    type="number"
+                    min="1"
+                    value={targetSets}
+                    onChange={(e) =>
+                        setTargetSets(Number(e.target.value))
+                    }
+                    placeholder="Sets"
+                />
+
+                <button type="submit">
+                    Add Exercise
+                </button>
+            </form>
+
+            <button
+                onClick={handleFinishWorkout}
+                style={{
+                    backgroundColor: "green",
+                    color: "white"
+                }}
+            >
+                Finish Workout
+            </button>
+        </div>
+    );
 }
 
 export default DayPage;
