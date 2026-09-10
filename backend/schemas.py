@@ -19,6 +19,10 @@ class ExerciseCreate(BaseModel):
 class SplitCreate(BaseModel):
     name: str
 
+class ExerciseUpdate(BaseModel):
+    name: str
+    target_sets: int
+
 
 class SplitDayCreate(BaseModel):
     name: str

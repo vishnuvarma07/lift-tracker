@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import Navbar from "../components/Navbar"
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function SplitsPage() {
@@ -57,7 +59,16 @@ function SplitsPage() {
 
     return (
         <div>
-            <h1>My Splits</h1>
+
+            <Navbar showBack={false}/>
+
+            <h1>
+                Dashboard
+            </h1>
+
+            <h2>
+                Splits
+            </h2>
 
             {splits.map((split) => (
                 <button key={split.id} onClick={() => navigate(`/splits/${split.id}`)}>

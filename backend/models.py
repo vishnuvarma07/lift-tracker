@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean
 from database import Base
 
 
@@ -35,6 +35,7 @@ class Exercise(Base):
     name = Column(String, nullable=False)
     exercise_order = Column(Integer, nullable=False)
     target_sets = Column(Integer, nullable=False)
+    is_active = Column(Boolean, nullable=False, default=True)
 
 
 class Workouts(Base):

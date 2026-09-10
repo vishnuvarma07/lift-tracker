@@ -1,7 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import Navbar from "../components/Navbar"
+
 const API_URL = import.meta.env.VITE_API_URL;
+
 
 function SplitDaysPage() {
     const { splitId } = useParams();
@@ -86,6 +89,9 @@ function SplitDaysPage() {
 
     return (
         <div>
+
+            <Navbar />
+
             <h1>{split?.name}</h1>
 
             {days.map((day) => (

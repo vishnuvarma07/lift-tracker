@@ -55,7 +55,7 @@ def create_token(data:dict, expires_delta: timedelta = None):
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(hours=4)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -309,7 +309,8 @@ def get_exercises(
         raise HTTPException(status_code=404, detail="Split or day not found")
 
     exercises = db.query(models.Exercise).filter(
-        models.Exercise.split_day_id==dayId,
+        models.Exercise.split_day_id == dayId,
+        models.Exercise.is_active == True
     ).order_by(
         models.Exercise.exercise_order
     ).all()
@@ -448,6 +449,115 @@ def get_previous_workout(
         "sets": previous_sets
     }
 
+@app.delete("/splits/{splitId}/days/{dayId}/exercises/{exerciseId}")
+def delete_exercise(
+    splitId: int,
+    dayId: int,
+    exerciseId: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    split = db.query(models.Split).filter(
+        models.Split.id == splitId,
+        models.Split.user_id == current_user.id
+    ).first()
+
+    if not split:
+        raise HTTPException(
+            status_code=404,
+            detail="Split not found"
+        )
+
+    day = db.query(models.SplitDay).filter(
+        models.SplitDay.id == dayId,
+        models.SplitDay.split_id == splitId
+    ).first()
+
+    if not day:
+        raise HTTPException(
+            status_code=404,
+            detail="Day not found"
+        )
+
+    exercise = db.query(models.Exercise).filter(
+        models.Exercise.id == exerciseId,
+        models.Exercise.split_day_id == dayId
+    ).first()
+
+    if not exercise:
+        raise HTTPException(
+            status_code=404,
+            detail="Exercise not found"
+        )
+
+    exercise.is_active = False
+
+    db.commit()
+    db.refresh(exercise)
+
+    return {
+        "message": "Exercise removed successfully"
+    }
+
+@app.put("/splits/{splitId}/days/{dayId}/exercises/{exerciseId}")
+def update_exercise(
+    splitId: int,
+    dayId: int,
+    exerciseId: int,
+    exercise_data: schemas.ExerciseUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    split = db.query(models.Split).filter(
+        models.Split.id == splitId,
+        models.Split.user_id == current_user.id
+    ).first()
+
+    if not split:
+        raise HTTPException(
+            status_code=404,
+            detail="Split not found"
+        )
+
+    day = db.query(models.SplitDay).filter(
+        models.SplitDay.id == dayId,
+        models.SplitDay.split_id == splitId
+    ).first()
+
+    if not day:
+        raise HTTPException(
+            status_code=404,
+            detail="Day not found"
+        )
+
+    old_exercise = db.query(models.Exercise).filter(
+        models.Exercise.id == exerciseId,
+        models.Exercise.split_day_id == dayId,
+        models.Exercise.is_active == True
+    ).first()
+
+    if not old_exercise:
+        raise HTTPException(
+            status_code=404,
+            detail="Exercise not found"
+        )
+
+    old_exercise.is_active = False
+
+    new_exercise = models.Exercise(
+        name=exercise_data.name,
+        target_sets=exercise_data.target_sets,
+        split_day_id=dayId,
+        exercise_order=old_exercise.exercise_order,
+        is_active=True
+    )
+
+    db.add(new_exercise)
+
+    db.commit()
+    db.refresh(new_exercise)
+
+    return new_exercise
 
 
 

@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -15,6 +16,8 @@ function DayPage() {
 
     const [setData, setSetData] = useState({});
     const [previousSets, setPreviousSets] = useState([]);
+
+    const [setCounts, setSetCounts] = useState({});
 
     useEffect(() => {
         const getPageData = async () => {
@@ -38,6 +41,14 @@ function DayPage() {
 
             setExercises(exerciseData.exercises);
             setDay(exerciseData.day);
+
+            const initialSetCounts = {};
+
+            exerciseData.exercises.forEach((exercise) => {
+                initialSetCounts[exercise.id] = exercise.target_sets;
+            });
+
+            setSetCounts(initialSetCounts);
 
             const previousResponse = await fetch(
                 `${API_URL}/splits/${splitId}/days/${dayId}/previous-workout`,
@@ -119,6 +130,30 @@ function DayPage() {
         }));
     };
 
+    const handleDeleteExercise = async (exerciseId) => {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(
+            `${API_URL}/splits/${splitId}/days/${dayId}/exercises/${exerciseId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.detail || "Could not delete exercise");
+            return;
+        }
+
+        setExercises(
+            exercises.filter((exercise) => exercise.id !== exerciseId)
+        );
+    };
+
     const handleFinishWorkout = async () => {
         const token = localStorage.getItem("token");
 
@@ -197,20 +232,23 @@ function DayPage() {
 
     return (
         <div>
-            <button onClick={() => navigate(`/splits/${splitId}`)}>
-                Back
-            </button>
+            
+            <Navbar />
 
             <h1>{day?.name}</h1>
 
             {exercises.map((exercise) => (
                 <div key={exercise.id}>
 
-                    <h3>
-                        {exercise.exercise_order}. {exercise.name}
-                    </h3>
+                    <div>
+                        <h3>
+                            {exercise.exercise_order}. {exercise.name}
+                        </h3>
 
-                    {Array.from({ length: exercise.target_sets }).map((_, index) => {
+                        
+                    </div>
+
+                    {Array.from({ length: setCounts[exercise.id] ?? exercise.target_sets }).map((_, index) => {
                         const setNumber = index + 1;
 
                         const previousSet = previousSets.find(
@@ -268,6 +306,40 @@ function DayPage() {
                             </div>
                         );
                     })}
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSetCounts((previous) => ({
+                                ...previous,
+                                [exercise.id]:
+                                    (previous[exercise.id] ?? exercise.target_sets) + 1
+                            }));
+                        }}
+                    >
+                        Add Set
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSetCounts((previous) => ({
+                                ...previous,
+                                [exercise.id]: Math.max(
+                                    1,
+                                    (previous[exercise.id] ?? exercise.target_sets) - 1
+                                )
+                            }));
+                        }}
+                    >
+                        Remove Set
+                    </button>
+
+                    <button
+                        onClick={() => handleDeleteExercise(exercise.id)}
+                    >
+                        Delete Exercise
+                    </button>
 
                 </div>
             ))}
