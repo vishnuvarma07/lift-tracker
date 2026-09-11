@@ -15,7 +15,6 @@
   --accent-border: rgba(255, 107, 0, 0.55);
 
   --code-bg: #252525;
-  --social-bg: #252525;
 
   --shadow:
     rgba(0, 0, 0, 0.35) 0 10px 15px -3px,
@@ -38,6 +37,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
+/* =========================
+   GLOBAL
+   ========================= */
+
 * {
   box-sizing: border-box;
 }
@@ -59,7 +63,6 @@ body {
 #root {
   width: 1126px;
   max-width: 100%;
-
   min-height: 100svh;
 
   margin: 0 auto;
@@ -73,6 +76,11 @@ body {
 
   border-inline: 1px solid var(--border);
 }
+
+
+/* =========================
+   HEADINGS
+   ========================= */
 
 h1,
 h2,
@@ -95,6 +103,7 @@ h2 {
   font-weight: 500;
 
   line-height: 118%;
+
   letter-spacing: -0.24px;
 
   margin: 0 0 8px;
@@ -108,6 +117,11 @@ h3 {
 p {
   margin: 0;
 }
+
+
+/* =========================
+   BUTTONS
+   ========================= */
 
 button {
   font: inherit;
@@ -142,6 +156,11 @@ button:disabled {
   cursor: not-allowed;
 }
 
+
+/* =========================
+   INPUTS
+   ========================= */
+
 input,
 select,
 textarea {
@@ -173,6 +192,11 @@ textarea::placeholder {
   color: #777777;
 }
 
+
+/* =========================
+   LINKS
+   ========================= */
+
 a {
   color: var(--accent);
   text-decoration: none;
@@ -182,8 +206,14 @@ a:hover {
   color: var(--accent-hover);
 }
 
+
+/* =========================
+   FORMS
+   ========================= */
+
 form {
   display: flex;
+
   justify-content: center;
   align-items: center;
 
@@ -191,6 +221,11 @@ form {
 
   flex-wrap: wrap;
 }
+
+
+/* =========================
+   CODE
+   ========================= */
 
 code,
 .counter {
@@ -205,6 +240,7 @@ code,
 
 code {
   font-size: 15px;
+
   line-height: 135%;
 
   padding: 4px 8px;
@@ -213,10 +249,13 @@ code {
 }
 
 
-/* NAVBAR */
+/* =========================
+   NAVBAR
+   ========================= */
 
 .navbar {
   width: 100%;
+  height: 64px;
   min-height: 64px;
 
   display: flex;
@@ -231,7 +270,12 @@ code {
   border-bottom: 1px solid var(--border);
 }
 
+
+/* BACK BUTTON */
+
 .navbar-back {
+  z-index: 2;
+
   background: transparent;
 
   color: var(--text);
@@ -241,42 +285,68 @@ code {
 
 .navbar-back:hover {
   background: var(--bg-tertiary);
+
   color: var(--text-h);
 }
 
-.navbar-logo {
+
+/* LOGO BUTTON */
+
+.navbar-logo-button {
   position: absolute;
 
   left: 50%;
-  transform: translateX(-50%);
+  top: 13%;
+
+  transform: translate(-50%, -50%);
+
+  width: 100px;
+  height: 48px;
+
+  padding: 0;
+
+  border: none;
 
   background: transparent;
 
-  color: var(--accent);
+  display: flex;
 
-  font-size: 22px;
-  font-weight: 700;
+  align-items: center;
+  justify-content: center;
 
-  letter-spacing: 1px;
-
-  padding: 8px 12px;
+  cursor: pointer;
 }
 
-.navbar-logo:hover {
+.navbar-logo-button:hover {
   background: transparent;
-  color: var(--accent-hover);
 }
 
-.navbar-logo:active {
-  transform: translateX(-50%) scale(0.98);
+.navbar-logo-button:active {
+  transform: translate(-50%, -50%) scale(0.96);
 }
 
 
-/* GENERAL PAGE LAYOUT */
+/* LOGO IMAGE */
+
+.navbar-logo-image {
+  display: block;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   PAGE LAYOUT
+   ========================= */
 
 .page-content {
   width: 100%;
-
   max-width: 1000px;
 
   margin: 0 auto;
@@ -285,12 +355,15 @@ code {
 }
 
 
-/* OPTIONAL CARD STYLE */
+/* =========================
+   CARDS
+   ========================= */
 
 .card {
   background: var(--bg-secondary);
 
   border: 1px solid var(--border);
+
   border-radius: 12px;
 
   padding: 20px;
@@ -299,10 +372,13 @@ code {
 }
 
 
-/* WORKOUT SET ROWS */
+/* =========================
+   WORKOUT SET ROWS
+   ========================= */
 
 .set-row {
   display: flex;
+
   justify-content: center;
   align-items: center;
 
@@ -316,15 +392,19 @@ code {
 }
 
 
-/* TABLET */
+/* =========================
+   TABLET
+   ========================= */
 
 @media (max-width: 1024px) {
+
   :root {
     font-size: 16px;
   }
 
   h1 {
     font-size: 36px;
+
     margin: 20px 0;
   }
 
@@ -338,9 +418,12 @@ code {
 }
 
 
-/* PHONE */
+/* =========================
+   PHONE
+   ========================= */
 
 @media (max-width: 600px) {
+
   #root {
     width: 100%;
 
@@ -351,14 +434,19 @@ code {
     font-size: 32px;
   }
 
+
+  /* NAVBAR */
+
   .navbar {
+    height: 58px;
     min-height: 58px;
 
     padding: 0 12px;
   }
 
-  .navbar-logo {
-    font-size: 18px;
+  .navbar-logo-button {
+    width: 85px;
+    height: 42px;
   }
 
   .navbar-back {
@@ -367,13 +455,22 @@ code {
     padding: 8px;
   }
 
+
+  /* PAGE */
+
   .page-content {
     padding: 16px;
   }
 
+
+  /* BUTTONS */
+
   button {
     min-height: 44px;
   }
+
+
+  /* INPUTS */
 
   input,
   select,
@@ -381,8 +478,12 @@ code {
     min-height: 44px;
   }
 
+
+  /* FORMS */
+
   form {
     flex-direction: column;
+
     align-items: stretch;
 
     padding: 0 16px;
@@ -393,8 +494,12 @@ code {
     width: 100%;
   }
 
+
+  /* WORKOUT SETS */
+
   .set-row {
     flex-direction: column;
+
     align-items: stretch;
 
     padding: 0 16px;

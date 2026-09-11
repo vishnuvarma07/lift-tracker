@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import "./Navbar.css";
 
 function Navbar({ showBack = true }) {
     const navigate = useNavigate();
 
     return (
         <nav className="navbar">
+
             {showBack && (
                 <button
                     className="navbar-back"
@@ -13,11 +15,17 @@ function Navbar({ showBack = true }) {
                     Back
                 </button>
             )}
+
             <button
-                className="navbar-logo"
+                className="navbar-logo-button"
                 onClick={() => navigate("/splits")}
+                aria-label="Go to dashboard"
             >
-                ENDURANCE
+                <img
+                    src="/endurancelogo.png"
+                    alt="Endurance"
+                    className="navbar-logo-image"
+                />
             </button>
 
         </nav>
