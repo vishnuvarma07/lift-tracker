@@ -12,7 +12,7 @@ function DayPage() {
     const [day, setDay] = useState(null);
 
     const [newExerciseName, setNewExerciseName] = useState("");
-    const [targetSets, setTargetSets] = useState(2);
+    const [targetSets, setTargetSets] = useState("");
 
     const [setData, setSetData] = useState({});
     const [previousSets, setPreviousSets] = useState([]);
@@ -92,7 +92,7 @@ function DayPage() {
                 },
                 body: JSON.stringify({
                     name: newExerciseName,
-                    target_sets: targetSets
+                    target_sets: Number(targetSets)
                 })
             }
         );
