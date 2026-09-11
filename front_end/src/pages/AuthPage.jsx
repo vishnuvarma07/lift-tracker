@@ -59,7 +59,7 @@ function AuthPage() {
 
     return (
         <div>
-            <h1>Lift Tracker</h1>
+            <h1>Endurance</h1>
             <form onSubmit={handleLogin}>
                 <input
                     type="text"

@@ -559,27 +559,37 @@ def update_exercise(
 
     return new_exercise
 
+@app.get("/stats")
+def get_stats(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    workouts = db.query(models.Workouts).filter(
+        models.Workouts.user_id == current_user.id
+    ).all()
 
+    workout_ids = [workout.id for workout in workouts]
 
-    
+    if not workout_ids:
+        return {
+            "total workouts": 0,
+            "total_sets": 0,
+            "total_volume":0
+        }
 
+    sets=db.query(models.Sets).filter(
+        models.Sets.workout_id.in_(workout_ids)
+    ).all()
 
+    total_volume = 0
 
+    for set in sets:
+        total_volume += set.weight * set.reps
 
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return {
+        "total_workouts": len(workouts),
+        "total_sets": len(sets),
+        "total_volume": total_volume
+    }
 
 

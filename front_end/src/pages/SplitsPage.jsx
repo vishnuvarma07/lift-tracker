@@ -85,6 +85,14 @@ function SplitsPage() {
                 />
                 <button type="submit">Add Split</button>
             </form>
+
+            <button className="stat-button" onClick={() => navigate("/stats")}>
+                Statistics
+            </button>
+
+
+
+            
         </div>
     );
 }
