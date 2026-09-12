@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function AuthPage() {
+function RegistrationPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -23,45 +23,17 @@ function AuthPage() {
             alert("Registration successful! Please log in.");
             setUsername("");
             setPassword("");
+            navigate("/")
         } else {
             alert("Registration failed. Please try again.");
         }
     }
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-
-        const formData = new URLSearchParams();
-        formData.append("username", username);
-        formData.append("password", password);
-
-        const response = await fetch(`${API_URL}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: formData,
-        });
-
-        if(!response.ok) {
-            alert("Login failed. Please try again.");
-            setUsername("");
-            setPassword("");
-            return;
-        }
-
-        const data = await response.json();
-
-        localStorage.setItem("token", data.access_token);
-
-        navigate("/splits");
-    }
-
     return (
         <div>
-            <h1>Endurance</h1>
+            <h1>Register</h1>
             <br />
-            <form onSubmit={handleLogin}>
+            <form onSubmit={handleRegister}>
                 <input
                     type="text"
                     placeholder="Username"
@@ -74,17 +46,14 @@ function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <button type="submit">Login</button>
+                <button type="submit">Register</button>
             </form>
             <br />
-            <br />
-            <h2>
-                Don't have an account?
-            </h2>
-            <button type="button" onClick={() => navigate("/register")}>Register</button>
+            <button onClick={() => navigate("/")}>
+                Back to login
+            </button>
         </div>
     )
-        
 }
 
-export default AuthPage;
+export default RegistrationPage;

@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SplitDaysPage from "./pages/SplitDaysPage";
 import DayPage from "./pages/DayPage"
 import StatisticsPage from "./pages/StatisticsPage";
+import RegistrationPage from "./pages/RegistrationPage";
 
 
 function App() {
@@ -13,6 +14,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AuthPage />} />
+
+        <Route path="/register" element={<RegistrationPage />} />
 
         <Route
           path="/splits"
