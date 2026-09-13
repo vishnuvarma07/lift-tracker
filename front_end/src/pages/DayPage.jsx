@@ -235,158 +235,188 @@ function DayPage() {
         <div>
             
             <Navbar />
+            <div className="header">
+                <h1 className="day-header">{day?.name}</h1>
+                <button
 
-            <h1>{day?.name}</h1>
-
-            {exercises.map((exercise) => (
-                <div key={exercise.id}>
-
-                    <div>
-                        <h3>
-                            {exercise.exercise_order}. {exercise.name}
-                        </h3>
-
-                        
-                    </div>
-
-                    {Array.from({ length: setCounts[exercise.id] ?? exercise.target_sets }).map((_, index) => {
-                        const setNumber = index + 1;
-
-                        const previousSet = previousSets.find(
-                            (set) =>
-                                set.exercise_id === exercise.id &&
-                                set.set_number === setNumber
-                        );
-
-                        return (
-                            <div key={index}>
-                                <span className = "set-txt">
-                                    Set {setNumber}
-                                </span>
-
-                                
-
-                                <input
-                                    type="number"
-                                    placeholder="Weight"
-                                    value={
-                                        setData[exercise.id]?.[setNumber]?.weight ?? ""
-                                    }
-                                    className="weight-input"
-                                    onChange={(e) =>
-                                        handleSetChange(
-                                            exercise.id,
-                                            setNumber,
-                                            "weight",
-                                            e.target.value
-                                        )
-                                    }
-                                />
-
-                                <input
-                                    type="number"
-                                    placeholder="Reps"
-                                    value={
-                                        setData[exercise.id]?.[setNumber]?.reps ?? ""
-                                    }
-                                    className="reps-input"
-                                    onChange={(e) =>
-                                        handleSetChange(
-                                            exercise.id,
-                                            setNumber,
-                                            "reps",
-                                            e.target.value
-                                        )
-                                    }
-                                />
-
-                                <span className="prev-set-txt">
-                                    {previousSet
-                                        ? `Previous: ${previousSet.weight} x ${previousSet.reps}`
-                                        : "Previous: —"}
-                                </span>
-
-                            </div>
-                        );
-                    })}
-
-                    <button
-                        type="button"
-                        className="add-set-btn"
-                        onClick={() => {
-                            setSetCounts((previous) => ({
-                                ...previous,
-                                [exercise.id]:
-                                    (previous[exercise.id] ?? exercise.target_sets) + 1
-                            }));
-                        }}
-                    >
-                        Add Set
-                    </button>
-
-                    <button
-                        type="button"
-                        className="remove-set-btn"
-                        onClick={() => {
-                            setSetCounts((previous) => ({
-                                ...previous,
-                                [exercise.id]: Math.max(
-                                    1,
-                                    (previous[exercise.id] ?? exercise.target_sets) - 1
-                                )
-                            }));
-                        }}
-                    >
-                        Remove Set
-                    </button>
-
-                    <button
-                        className="delete-btn"
-                        onClick={() => handleDeleteExercise(exercise.id)}
-                    >
-                        Delete Exercise
-                    </button>
-
-                </div>
-            ))}
-
-            <button
-                onClick={handleFinishWorkout}
-                style={{
-                    backgroundColor: "green",
-                    color: "white"
-                }}
-                className="finish-workout-btn"
-            >
-                Finish Workout
-            </button>
-
-            <form onSubmit={handleAddExercise}>
-                <input
-                    type="text"
-                    value={newExerciseName}
-                    onChange={(e) =>
-                        setNewExerciseName(e.target.value)
-                    }
-                    placeholder="Exercise Name"
-                    className="add-exercise-name"
-                />
-
-                <input
-                    type="number"
-                    min="1"
-                    value={targetSets}
-                    onChange={(e) =>
-                        setTargetSets(Number(e.target.value))
-                    }
-                    placeholder="Sets"
-                    className="add-exercise-sets"
-                />
-
-                <button type="submit" className="add-exercise-btn">
-                    Add Exercise
+                    onClick={handleFinishWorkout}
+                    style={{
+                        backgroundColor: "green",
+                        color: "white"
+                    }}
+                    className="finish-workout-btn-header"
+                >
+                    Finish Workout
                 </button>
-            </form>
+            </div>
+            
+
+            <div className="exercise-scroll-container">
+                {exercises.map((exercise) => (
+
+                    <div className="exercise-card"key={exercise.id}>
+
+                        <div>
+                            <h3>
+                                {exercise.exercise_order}. {exercise.name}
+                            </h3>
+
+                            
+                        </div>
+
+                        {Array.from({ length: setCounts[exercise.id] ?? exercise.target_sets }).map((_, index) => {
+                            const setNumber = index + 1;
+
+                            const previousSet = previousSets.find(
+                                (set) =>
+                                    set.exercise_id === exercise.id &&
+                                    set.set_number === setNumber
+                            );
+
+                            return (
+                                <div key={index}>
+                                    <span className = "set-txt">
+                                        Set {setNumber}
+                                    </span>
+
+                                    
+
+                                    <input
+                                        type="number"
+                                        placeholder="Weight"
+                                        value={
+                                            setData[exercise.id]?.[setNumber]?.weight ?? ""
+                                        }
+                                        className="weight-input"
+                                        onChange={(e) =>
+                                            handleSetChange(
+                                                exercise.id,
+                                                setNumber,
+                                                "weight",
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                    <input
+                                        type="number"
+                                        placeholder="Reps"
+                                        value={
+                                            setData[exercise.id]?.[setNumber]?.reps ?? ""
+                                        }
+                                        className="reps-input"
+                                        onChange={(e) =>
+                                            handleSetChange(
+                                                exercise.id,
+                                                setNumber,
+                                                "reps",
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                    <span className="prev-set-txt">
+                                        {previousSet
+                                            ? `Previous: ${previousSet.weight} x ${previousSet.reps}`
+                                            : "Previous: —"}
+                                    </span>
+
+                                </div>
+                            );
+                        })}
+
+                        <div className="exercise-controls">
+                            <button
+                                type="button"
+                                className="add-set-btn"
+                                onClick={() => {
+                                    setSetCounts((previous) => ({
+                                        ...previous,
+                                        [exercise.id]:
+                                            (previous[exercise.id] ?? exercise.target_sets) + 1
+                                    }));
+                                }}
+                            >
+                                Add Set
+                            </button>
+
+                            <button
+                                type="button"
+                                className="remove-set-btn"
+                                onClick={() => {
+                                    setSetCounts((previous) => ({
+                                        ...previous,
+                                        [exercise.id]: Math.max(
+                                            1,
+                                            (previous[exercise.id] ?? exercise.target_sets) - 1
+                                        )
+                                    }));
+                                }}
+                            >
+                                Remove Set
+                            </button>
+                        </div>
+                        <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteExercise(exercise.id)}
+                        >
+                            Delete Exercise
+                        </button>
+                        
+
+                    </div>
+                ))}
+
+                <div className="workout-control-card">
+                    <button
+                        onClick={handleFinishWorkout}
+                        style={{
+                            backgroundColor: "green",
+                            color: "white"
+                        }}
+                        className="finish-workout-btn"
+                    >
+                        Finish Workout
+                    </button>
+
+                    <h2>
+                        Add Exercise
+                    </h2>
+                    <form onSubmit={handleAddExercise}>
+
+                        <div className="add-exercise-inputs">
+                            <input
+                            type="text"
+                            value={newExerciseName}
+                            onChange={(e) =>
+                                setNewExerciseName(e.target.value)
+                            }
+                            placeholder="Exercise Name"
+                            className="add-exercise-name"
+                        />
+
+                        <input
+                            type="number"
+                            min="1"
+                            value={targetSets}
+                            onChange={(e) =>
+                                setTargetSets(Number(e.target.value))
+                            }
+                            placeholder="Sets"
+                            className="add-exercise-sets"
+                        />
+                        </div>
+                        <button type="submit" className="add-exercise-btn">
+                            Add 
+                        </button>
+                    </form>
+                    
+
+                    
+                    
+                </div>
+
+            </div>
 
         </div>
     );
