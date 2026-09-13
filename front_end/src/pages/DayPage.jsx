@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Navbar from "../components/Navbar"
 import "./DayPage.css"
 
@@ -19,6 +19,8 @@ function DayPage() {
     const [previousSets, setPreviousSets] = useState([]);
 
     const [setCounts, setSetCounts] = useState({});
+
+    const scrollContainerRef = useRef(null);
 
     useEffect(() => {
         const getPageData = async () => {
@@ -42,6 +44,13 @@ function DayPage() {
 
             setExercises(exerciseData.exercises);
             setDay(exerciseData.day);
+
+            setTimeout(() => {
+                scrollContainerRef.current?.scrollTo({
+                    top: 0,
+                    behavior: "auto"
+                });
+            }, 0);
 
             const initialSetCounts = {};
 
@@ -251,7 +260,7 @@ function DayPage() {
             </div>
             
 
-            <div className="exercise-scroll-container">
+            <div className="exercise-scroll-container" ref={scrollContainerRef}>
                 {exercises.map((exercise) => (
 
                     <div className="exercise-card"key={exercise.id}>
