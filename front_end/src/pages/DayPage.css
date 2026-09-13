@@ -1,0 +1,55 @@
+.weight-input {
+    margin-left: 1vw;
+    margin-right: 1vw;
+    margin-bottom: 1vh;
+}
+
+.reps-input {
+    margin-right: 1vw;
+    margin-bottom: 1vh;
+}
+
+.add-set-btn {
+    margin-right: 0.5vw;
+}
+
+.remove-set-btn {
+    margin-right: 0.5vw;
+}
+
+.add-exercise-name {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.add_exercise-sets {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.add-exercise-btn {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.finish-workout-btn {
+    margin-top: 4vh;
+    margin-bottom: 3vh;
+}
+
+@media (max-width: 457px) {
+    .set-txt {
+        display: block;
+        margin-bottom: 1vh;
+    }
+    .prev-set-txt {
+        display: block;
+        margin-bottom: 1.5vh;
+    }
+    .weight-input {
+        width: 42%;
+    }
+    .reps-input {
+        width: 42%;
+    }
+}

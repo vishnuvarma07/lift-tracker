@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./SplitsPage.css";
 
 import Navbar from "../components/Navbar"
 
@@ -71,7 +72,7 @@ function SplitsPage() {
             </h2>
 
             {splits.map((split) => (
-                <button key={split.id} onClick={() => navigate(`/splits/${split.id}`)}>
+                <button className="split-button" key={split.id} onClick={() => navigate(`/splits/${split.id}`)}>
                     {split.name}
                 </button>
             ))}

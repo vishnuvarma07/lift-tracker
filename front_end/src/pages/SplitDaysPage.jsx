@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import Navbar from "../components/Navbar"
+import "./SplitDaysPage.css"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -100,6 +101,7 @@ function SplitDaysPage() {
                     onClick={() =>
                         navigate(`/splits/${splitId}/days/${day.id}`)
                     }
+                    className="split-day-btn"
                 >
                     {day.name}
                 </button>

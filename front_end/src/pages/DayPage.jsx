@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar"
+import "./DayPage.css"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -259,7 +260,7 @@ function DayPage() {
 
                         return (
                             <div key={index}>
-                                <span>
+                                <span className = "set-txt">
                                     Set {setNumber}
                                 </span>
 
@@ -271,6 +272,7 @@ function DayPage() {
                                     value={
                                         setData[exercise.id]?.[setNumber]?.weight ?? ""
                                     }
+                                    className="weight-input"
                                     onChange={(e) =>
                                         handleSetChange(
                                             exercise.id,
@@ -287,6 +289,7 @@ function DayPage() {
                                     value={
                                         setData[exercise.id]?.[setNumber]?.reps ?? ""
                                     }
+                                    className="reps-input"
                                     onChange={(e) =>
                                         handleSetChange(
                                             exercise.id,
@@ -297,7 +300,7 @@ function DayPage() {
                                     }
                                 />
 
-                                <span>
+                                <span className="prev-set-txt">
                                     {previousSet
                                         ? `Previous: ${previousSet.weight} x ${previousSet.reps}`
                                         : "Previous: —"}
@@ -309,6 +312,7 @@ function DayPage() {
 
                     <button
                         type="button"
+                        className="add-set-btn"
                         onClick={() => {
                             setSetCounts((previous) => ({
                                 ...previous,
@@ -322,6 +326,7 @@ function DayPage() {
 
                     <button
                         type="button"
+                        className="remove-set-btn"
                         onClick={() => {
                             setSetCounts((previous) => ({
                                 ...previous,
@@ -336,6 +341,7 @@ function DayPage() {
                     </button>
 
                     <button
+                        className="delete-btn"
                         onClick={() => handleDeleteExercise(exercise.id)}
                     >
                         Delete Exercise
@@ -343,6 +349,17 @@ function DayPage() {
 
                 </div>
             ))}
+
+            <button
+                onClick={handleFinishWorkout}
+                style={{
+                    backgroundColor: "green",
+                    color: "white"
+                }}
+                className="finish-workout-btn"
+            >
+                Finish Workout
+            </button>
 
             <form onSubmit={handleAddExercise}>
                 <input
@@ -352,6 +369,7 @@ function DayPage() {
                         setNewExerciseName(e.target.value)
                     }
                     placeholder="Exercise Name"
+                    className="add-exercise-name"
                 />
 
                 <input
@@ -362,22 +380,14 @@ function DayPage() {
                         setTargetSets(Number(e.target.value))
                     }
                     placeholder="Sets"
+                    className="add-exercise-sets"
                 />
 
-                <button type="submit">
+                <button type="submit" className="add-exercise-btn">
                     Add Exercise
                 </button>
             </form>
 
-            <button
-                onClick={handleFinishWorkout}
-                style={{
-                    backgroundColor: "green",
-                    color: "white"
-                }}
-            >
-                Finish Workout
-            </button>
         </div>
     );
 }
